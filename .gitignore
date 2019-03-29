@@ -1,0 +1,15 @@
+# Python byte-code
+*.py[co]
+
+# virutalenv directories
+/venv*/
+
+# coverage files
+.coverage
+
+*/__pycache__/
+.ipynb_checkpoints
+
+.aux
+
+.DS_Store
