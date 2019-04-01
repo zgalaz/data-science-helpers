@@ -18,11 +18,11 @@ def plot_classification(X,
                         y_label="y",
                         **plot_kwargs):
     """
-    Cross-validate the binary classification model
+    Plot the classification graph
 
-    This function cross-validates the input classification model using X, y. The
-    cross-validation is sed by num_folds and num_repetitions. After the model is
-    cross-validated, several metrics are computed.
+    This function plots the classification graph showing the ground truth labels
+    and the predicted ones. It also points out oo the miss-classifications, and
+    displays several classification metrics to show the model's performance.
 
     Parameters
     ----------
