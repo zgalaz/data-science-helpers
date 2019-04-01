@@ -1,4 +1,5 @@
 import inspect
+import numpy as np
 from collections import defaultdict
 from sklearn.model_selection import KFold
 from helpers.regression.metrics import regression_metric
@@ -93,7 +94,10 @@ def cross_validate_regressor(X,
 
                 # Compute the regression metrics
                 for metric in metrics:
-                    table_cv_data[metric].append(regression_metric(metric, y_true, y_pred))
+                    computed = regression_metric(metric, y_true, y_pred, X.shape[2] if X.ndim > 1 else 1)
+                    computed = computed if computed and np.isfinite(computed) else None
+                    if computed:
+                        table_cv_data[metric].append(computed)
 
             except Exception as e:
                 if "Input contains NaN, infinity or a value too large" in str(e):

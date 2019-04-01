@@ -98,7 +98,10 @@ def cross_validate_classifier(X,
 
                 # Compute the classification metrics
                 for metric in metrics:
-                    table_cv_data[metric].append(classification_metric(metric, y_true, y_pred))
+                    computed = classification_metric(metric, y_true, y_pred)
+                    computed = computed if computed and np.isfinite(computed) else None
+                    if computed:
+                        table_cv_data[metric].append(computed)
 
             except Exception as e:
                 if "Input contains NaN, infinity or a value too large" in str(e):
