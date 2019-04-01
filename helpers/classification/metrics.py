@@ -1,4 +1,5 @@
-from sklearn.metrics import confusion_matrix, recall_score
+from sklearn.metrics import confusion_matrix
+from sklearn.metrics import matthews_corrcoef, accuracy_score, precision_score, recall_score, f1_score
 
 
 def sensitivity_score(y_true, y_pred):
@@ -64,3 +65,51 @@ def specificity_score(y_true, y_pred):
 
     # Compute the specificity score
     return tn / (tn + fp)
+
+
+def classification_metric(metric, y_true, y_pred):
+    """
+    Compute classification metric
+
+    Classification metric is computed using a definition dictionary storing
+    key, val pairs that define each classification metric function call.
+    Supported classifications metrics:
+     - Matthews correlation coefficient (mcc)
+     - accuracy (acc)
+     - sensitivity (sen)
+     - specificity (spe)
+     - precision (pre)
+     - recall (rec)
+     - F1 score (f1)
+
+    Parameters
+    ----------
+
+    metric : str
+        classification metric abbreviation
+
+    y_true : numpy array
+        1D labels array of ground truth labels
+
+    y_pred : numpy array
+        1D labels array of predicted labels
+
+    Returns
+    -------
+
+    Score value (float)
+    """
+
+    # Define the classification metrics
+    metrics = {
+        "mcc": matthews_corrcoef,
+        "acc": accuracy_score,
+        "sen": sensitivity_score,
+        "spe": specificity_score,
+        "pre": precision_score,
+        "rec": recall_score,
+        "f1": f1_score
+    }
+
+    # Compute the classification metric
+    return metrics[metric](y_true, y_pred)
