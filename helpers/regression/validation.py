@@ -94,7 +94,7 @@ def cross_validate_regressor(X,
 
                 # Compute the regression metrics
                 for metric in metrics:
-                    computed = regression_metric(metric, y_true, y_pred, X.shape[2] if X.ndim > 1 else 1)
+                    computed = regression_metric(metric, y_true, y_pred, 1 if X.ndim == 1 else X.shape[1])
                     computed = computed if computed and np.isfinite(computed) else None
                     if computed:
                         table_cv_data[metric].append(computed)
