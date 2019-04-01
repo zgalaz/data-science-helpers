@@ -22,7 +22,7 @@ def cross_validate_classifier(X,
     Cross-validate the binary classification model
 
     This function cross-validates the input classification model using X, y. The
-    cross-validation is sed by num_folds and num_repetitions. After the model is
+    cross-validation is set by num_folds and num_repetitions. After the model is
     cross-validated, several metrics are computed.
 
     Parameters
@@ -34,7 +34,7 @@ def cross_validate_classifier(X,
     y : numpy array
         1D labels array
 
-    model : class that implements fir, and predict methods
+    model : class that implements fit, and predict methods
         Initialized binary classification model
 
     threshold : float, optional, default 0.5
