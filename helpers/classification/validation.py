@@ -1,10 +1,8 @@
 import inspect
 import numpy as np
-import pandas as pd
 from collections import defaultdict
 from sklearn.model_selection import StratifiedKFold
-from sklearn.metrics import matthews_corrcoef, accuracy_score, precision_score, recall_score, f1_score
-from helpers.classification.metrics import sensitivity_score, specificity_score
+from helpers.classification.metrics import classification_metric
 from helpers.utils.logger import Logger
 
 
@@ -22,16 +20,7 @@ def cross_validate_classifier(X,
 
     This function cross-validates the input classification model using X, y. The
     cross-validation is sed by num_folds and num_repetitions. After the model is
-    cross-validated, several metrics are computed
-
-    Supported classifications metrics:
-     - Matthews correlation coefficient (mcc)
-     - accuracy (acc)
-     - sensitivity (sen)
-     - specificity (spe)
-     - precision (pre)
-     - recall (rec)
-     - F1 score (f1)
+    cross-validated, several metrics are computed.
 
     Parameters
     ----------
@@ -63,9 +52,6 @@ def cross_validate_classifier(X,
     logger : Logger, optional, default None
         Logger class
 
-    verbose: bool, optional, default False
-        Verbose switch
-
     Returns
     -------
 
@@ -89,17 +75,6 @@ def cross_validate_classifier(X,
     # Prepare the logger
     logger = logger if logger else Logger(inspect.currentframe().f_code.co_name)
 
-    # Prepare the classification metrics dict
-    cls_metrics = {
-        "mcc": matthews_corrcoef,
-        "acc": accuracy_score,
-        "sen": sensitivity_score,
-        "spe": specificity_score,
-        "pre": precision_score,
-        "rec": recall_score,
-        "f1": f1_score
-    }
-
     # Prepare the results table for the cross-validation results
     table_cv_data = defaultdict(list)
 
@@ -111,7 +86,6 @@ def cross_validate_classifier(X,
 
         # Get the cross-validation indices
         kfolds = StratifiedKFold(n_splits=num_folds, random_state=seed, shuffle=True)
-        nfolds = 1
 
         # Cross-validate the classifier
         for train_index, test_index in kfolds.split(X, y):
@@ -129,24 +103,20 @@ def cross_validate_classifier(X,
                 predicted = model.predict(X_test)
 
                 # Encode the labels
-                y_true = pd.Series(y_test, dtype=np.int16)
-                y_pred = pd.Series([0 if y_hat < threshold else 1 for y_hat in predicted], dtype=np.int16)
+                y_true = np.array(y_test, dtype=np.int16)
+                y_pred = np.array([0 if y_hat < threshold else 1 for y_hat in predicted], dtype=np.int16)
 
                 # Compute the classification metrics
                 for metric in metrics:
-                    if metric in cls_metrics:
-                        table_cv_data[metric].append(cls_metrics[metric](y_true, y_pred))
+                    table_cv_data[metric].append(classification_metric(metric, y_true, y_pred))
 
             except Exception as e:
                 if "Input contains NaN, infinity or a value too large" in str(e):
-                    logger.warning('Poor performance for {}/{} validation fold'.format(nfolds, num_folds))
+                    logger.warning('Poor performance detected')
                     num_skips += 1
                     continue
                 else:
                     logger.exception(e)
-
-            finally:
-                nfolds += 1
 
     # Inform about poor performance skips
     if num_skips > 0:
