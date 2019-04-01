@@ -112,4 +112,6 @@ def classification_metric(metric, y_true, y_pred):
     }
 
     # Compute the classification metric
+    if metric not in metrics:
+        raise ValueError("Unknown classification metric, supported: {}".format(metrics.keys()))
     return metrics[metric](y_true, y_pred)
