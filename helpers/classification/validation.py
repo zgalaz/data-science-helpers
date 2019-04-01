@@ -3,12 +3,12 @@ import numpy as np
 from collections import defaultdict
 from sklearn.model_selection import StratifiedKFold
 from helpers.classification.metrics import classification_metric
-from helpers.utils.validators import check_numpy_array, check_observation_count
+from helpers.utils.validators import validate_x_y_numpy_array, validate_x_y_observation_count
 from helpers.utils.logger import Logger
 
 
-@check_numpy_array
-@check_observation_count
+@validate_x_y_numpy_array
+@validate_x_y_observation_count
 def cross_validate_classifier(X,
                               y,
                               model,
