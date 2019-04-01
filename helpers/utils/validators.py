@@ -20,7 +20,7 @@ def validate_x_y_numpy_array(func):
 def validate_args_one_dimensional(func):
     def func_wrapper(*args, **kwargs):
         if not all([True if arg.ndim == 1 else False for arg in args]):
-            raise TypeError("Input arrays must be one dimensional")
+            raise ValueError("Input arrays must be one dimensional")
         return func(*args, **kwargs)
     return func_wrapper
 
@@ -28,7 +28,7 @@ def validate_args_one_dimensional(func):
 def validate_args_two_dimensional(func):
     def func_wrapper(*args, **kwargs):
         if not all([True if arg.ndim == 2 else False for arg in args]):
-            raise TypeError("Input arrays must be one dimensional")
+            raise ValueError("Input arrays must be one dimensional")
         return func(*args, **kwargs)
     return func_wrapper
 
@@ -36,6 +36,6 @@ def validate_args_two_dimensional(func):
 def validate_args_rank_one_or_one_dimensional(func):
     def func_wrapper(*args, **kwargs):
         if not all([True if arg.ndim == 1 or any(a == 1 for a in arg.shape) else False for arg in args]):
-            raise TypeError("Input arrays must be one dimensional")
+            raise ValueError("Input arrays must be one dimensional")
         return func(*args, **kwargs)
     return func_wrapper
