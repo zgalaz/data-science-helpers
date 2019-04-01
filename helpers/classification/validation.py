@@ -3,9 +3,12 @@ import numpy as np
 from collections import defaultdict
 from sklearn.model_selection import StratifiedKFold
 from helpers.classification.metrics import classification_metric
+from helpers.utils.validators import check_numpy_array, check_observation_count
 from helpers.utils.logger import Logger
 
 
+@check_numpy_array
+@check_observation_count
 def cross_validate_classifier(X,
                               y,
                               model,
@@ -67,34 +70,21 @@ def cross_validate_classifier(X,
         Raised when X and y have not the same number of rows (observations)
     """
 
-    if not all((isinstance(X, np.ndarray), isinstance(y, np.ndarray))):
-        raise TypeError('Input arrays must be of type np.ndarray')
-    if not X.shape[0] == y.shape[0]:
-        raise ValueError('Input arrays must have the same number of rows (observations)')
-
     # Prepare the logger
     logger = logger if logger else Logger(inspect.currentframe().f_code.co_name)
 
     # Prepare the results table for the cross-validation results
     table_cv_data = defaultdict(list)
 
-    # Prepare counter for poor prediction skips
-    num_skips = 0
-
     # Run the desired number of cross-validation repetitions
     for repetition in range(num_repetitions):
+        for train_i, test_i in StratifiedKFold(n_splits=num_folds, random_state=seed, shuffle=True).split(X, y):
 
-        # Get the cross-validation indices
-        kfolds = StratifiedKFold(n_splits=num_folds, random_state=seed, shuffle=True)
-
-        # Cross-validate the classifier
-        for train_index, test_index in kfolds.split(X, y):
+            # Split the data to train, test sets
+            X_train, X_test = X[train_i], X[test_i]
+            y_train, y_test = y[train_i], y[test_i]
 
             try:
-
-                # Split the data to train, test sets
-                X_train, X_test = X[train_index], X[test_index]
-                y_train, y_test = y[train_index], y[test_index]
 
                 # fit the classifier
                 model.fit(X_train, y_train)
@@ -112,14 +102,9 @@ def cross_validate_classifier(X,
 
             except Exception as e:
                 if "Input contains NaN, infinity or a value too large" in str(e):
-                    logger.warning('Poor performance detected')
-                    num_skips += 1
+                    logger.warning("Poor performance detected, skipping current validation fold")
                     continue
                 else:
                     logger.exception(e)
-
-    # Inform about poor performance skips
-    if num_skips > 0:
-        logger.info("{}/{} validation folds skipped (performance)".format(num_skips, num_folds * num_repetitions))
 
     return table_cv_data
