@@ -106,7 +106,7 @@ def adjusted_r_squared(y_true, y_pred, num_predictors=1):
     return 1 - (((1 - r2_score(y_true, y_pred)) * (len(y_true) - 1)) / (len(y_true) - num_predictors - 1))
 
 
-def regression_metric(metric, y_true, y_pred, num_predictors=None):
+def regression_metric(metric, y_true, y_pred, num_predictors=1):
     """
     Compute regression metric
 
@@ -131,6 +131,9 @@ def regression_metric(metric, y_true, y_pred, num_predictors=None):
 
     y_pred : numpy array
         1D labels array of predicted labels
+
+    num_predictors : int, optional, default 1
+        Number of predictors
 
     Returns
     -------
