@@ -43,13 +43,13 @@ def plot_box_violin(x,
     ax : matplotlib.axes, optional, default None
         Axes to use for the plot (if no axes, a new figure is created)
 
-    fig_size : tuple, optional, default (12, 5)
+    fig_size : tuple, optional, default (8, 8)
         Size of the figure
 
     fig_show : bool, optional, default True
         Figure showing switch
 
-    save_as : bool, optional, default "figure.pdf"
+    save_as : str, optional, default "figure.pdf"
         Name of the saved figure (if None, saving skipped)
 
     title : str, optional, default None ("")

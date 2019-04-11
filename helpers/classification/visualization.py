@@ -48,7 +48,7 @@ def plot_classification(X,
     fig_show : bool, optional, default True
         Figure showing switch
 
-    save_as : bool, optional, default "figure.pdf"
+    save_as : str, optional, default "figure.pdf"
         Name of the saved figure (if None, saving skipped)
 
     x_label : str, optional, default "x"
