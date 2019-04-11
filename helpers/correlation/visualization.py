@@ -14,6 +14,7 @@ from helpers.utils.validators import \
 def plot_correlation(X,
                      y,
                      corr_type="pearson",
+                     ax=None,
                      fig_size=(8, 8),
                      fig_show=True,
                      save_as="figure.pdf",
@@ -38,6 +39,9 @@ def plot_correlation(X,
 
     corr_type : str
         Type of correlation to compute
+
+    ax : matplotlib.axes, optional, default None
+        Axes to use for the plot (if no axes are provided, a new figure is created)
 
     fig_size : tuple, optional, default (12, 5)
         Size of the figure
@@ -65,11 +69,10 @@ def plot_correlation(X,
         Raised when args (input arrays) are not rank-one or one-dimensional
     """
 
-    # Create the figure
-    fig = plt.figure(figsize=fig_size)
-
-    # Create the axes
-    ax = fig.add_subplot(1, 1, 1)
+    # Create the figure and axes if necessary
+    if not ax:
+        fig = plt.figure(figsize=fig_size if fig_size else (8, 8))
+        ax = fig.add_subplot(1, 1, 1)
 
     # Reshape to 1D but non-rank 1 arrays
     if X.ndim == 1:
@@ -103,5 +106,3 @@ def plot_correlation(X,
     # Show the graph (if enabled)
     if fig_show:
         plt.show()
-    else:
-        plt.close()
