@@ -1,4 +1,13 @@
 import numpy as np
+import pandas as pd
+
+
+def validate_df_dataframe(func):
+    def func_wrapper(df, *args, **kwargs):
+        if not isinstance(df, pd.DataFrame):
+            raise TypeError("Input dataframe must be of type pd.DataFrame")
+        return func(df, *args, **kwargs)
+    return func_wrapper
 
 
 def validate_x_y_observation_count(func):
