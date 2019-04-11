@@ -1,9 +1,10 @@
+import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 from itertools import combinations
 from scipy.stats import mannwhitneyu
 from helpers.common.visualization import starify_pval
-from helpers.utils.validators import validate_x_y_str
+from helpers.utils.validators import validate_x_y_str, validate_df_dataframe
 
 
 @validate_x_y_str
@@ -75,10 +76,6 @@ def plot_box_violin(x,
 
     TypeError
         Raised when X or y is not an instance of str
-
-    ValueError
-        Raised when X and y have not the same number of rows (observations)
-        Raised when args (input arrays) are not rank-one or one-dimensional
     """
 
     # TODO: introduce additional kwargs for finer adjustments
@@ -213,6 +210,90 @@ def plot_box_violin(x,
 
     ax.yaxis.grid(True)
     ax.xaxis.grid(True)
+
+    # Store the figure
+    if save_as:
+        plt.savefig(save_as)
+
+    # Show the graph (if enabled)
+    if fig_show:
+        plt.show()
+
+
+@validate_df_dataframe
+def plot_missing_values(df,
+                        ax=None,
+                        fig_size=(8, 8),
+                        fig_show=True,
+                        save_as="figure.pdf",
+                        x_ticklabels=None,
+                        y_ticklabels=None,
+                        title=None):
+    """
+    Plot missing values
+
+    This function plots the DataFrame as a 2D plane with missing values (NaNs) as
+    black squares and non-missing values (no matter what value) as white squares
+    given the ticklabels (if not provided, df.columns (x axis), and df.index (y
+    axis) are used by default).
+
+    Parameters
+    ----------
+
+    df : pandas.DataFrame
+        Pandas DataFrame with the data for plotting
+
+    ax : matplotlib.axes, optional, default None
+        Axes to use for the plot (if no axes, a new figure is created)
+
+    fig_size : tuple, optional, default (8, 8)
+        Size of the figure
+
+    fig_show : bool, optional, default True
+        Figure showing switch
+
+    save_as : str, optional, default "figure.pdf"
+        Name of the saved figure (if None, saving skipped)
+
+    x_ticklabels : list or tuple, optional, default None (df.index)
+        Labels of the ticks for the x axis (observation names)
+
+    y_ticklabels : list or tuple, optional, default None (df.columns)
+        Labels of the ticks for the y axis (feature names)
+
+    title : str, optional, default None ("Missing values")
+        Title of the plot
+
+    Raises
+    ------
+
+    TypeError
+        Raised when df is not an instance of pd.DataFrame
+    """
+
+    # Prepare the missing values
+    missing_values = df.isnull()
+
+    # Create the figure and axes if necessary
+    if not ax:
+        fig = plt.figure(figsize=fig_size if fig_size else (8, 8))
+        ax = fig.add_subplot(1, 1, 1)
+
+    # Plot the graph
+    sns.heatmap(missing_values, ax=ax, cbar=False, cmap="Greys", linewidths=0.3, linecolor="#c8d6e5")
+
+    # Set up the ticks and labels
+    ax.set_xticks(np.arange(0, len(df.columns), 1))
+    ax.set_yticks(np.arange(0, len(df.index), 1))
+    ax.set_xticklabels(x_ticklabels if x_ticklabels else df.columns)
+    ax.set_yticklabels(y_ticklabels if y_ticklabels else df.index)
+    ax.set_title(title if title else "Missing values")
+    ax.grid()
+
+    plt.tick_params(top=False, bottom=True, left=True, right=False)
+    plt.xticks(rotation=90)
+    plt.yticks(rotation=0)
+    plt.tight_layout()
 
     # Store the figure
     if save_as:
