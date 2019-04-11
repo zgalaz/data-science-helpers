@@ -17,6 +17,14 @@ def validate_x_y_numpy_array(func):
     return func_wrapper
 
 
+def validate_x_y_str(func):
+    def func_wrapper(x, y, *args, **kwargs):
+        if not all((isinstance(x, str), isinstance(y, str))):
+            raise TypeError("Input arrays must be of type str")
+        return func(x, y, *args, **kwargs)
+    return func_wrapper
+
+
 def validate_args_one_dimensional(func):
     def func_wrapper(*args, **kwargs):
         if not all([True if arg.ndim == 1 else False for arg in args]):
