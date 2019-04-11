@@ -14,6 +14,7 @@ setup(
         'pandas',
         'matplotlib',
         'seaborn',
-        'sklearn'
+        'sklearn',
+        'scipy'
     ]
 )
