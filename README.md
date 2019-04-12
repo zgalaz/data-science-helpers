@@ -52,6 +52,7 @@ pip install .
     |   correlation_notebook.ipynb
     |   exploration_notebook.ipynb
     |   regression_notebook.ipynb
+    |   utils_notebook.ipynb
 ```
 
 # License
