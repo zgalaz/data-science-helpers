@@ -44,6 +44,7 @@ pip install .
 |   |           
 |   \---utils
 |       |   logger.py
+|       |   transformers.py
 |       |   validators.py
 |               
 +---notebooks
