@@ -49,7 +49,7 @@ class CovariateController(BaseEstimator, TransformerMixin):
     covariates : numpy array
         Numpy array storing the covariates used to fit the linear regression
         models. After __init__(), the covariates are unknown and therefore
-        the variable is None, After fir(), covariates.shape corresponds to
+        the variable is None, After fit(), covariates.shape corresponds to
         the number of observations (rows) and features (cols) used to fit
         the models (model per input feature vector).
 
