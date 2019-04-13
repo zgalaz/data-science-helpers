@@ -4,7 +4,7 @@ from sklearn.linear_model import LinearRegression
 
 
 @validate_args_numpy_array
-def remove_effect_of_covariates(X, c):
+def remove_effect_of_covariates(X, c, inline=False):
     """
     Remove the effect of covariates from the features
 
@@ -23,6 +23,9 @@ def remove_effect_of_covariates(X, c):
     c : numpy array
         1D or 2D array of covariates (rows=observations, cols=covariates)
 
+    inline : bool, optional, default False
+        Specify if it is feasible to alter the original DataFrame
+
     Returns
     -------
 
@@ -38,20 +41,23 @@ def remove_effect_of_covariates(X, c):
     # Standardize the values of the covariates
     c = StandardScaler().fit_transform(c)
 
+    # Get the DataFrame to work with
+    x = X.copy() if not inline else X
+
     # Prepare the dimensions
-    X = make_2_ndim(X)
+    x = make_2_ndim(x)
     c = make_2_ndim(c)
 
-    for i in range(X.shape[1]):
+    for i in range(x.shape[1]):
 
         # Create the linear regression model
         regressor = LinearRegression()
 
         # fit the regressor (feature = f(covariates))
-        regressor.fit(c, X[:, i])
+        regressor.fit(c, x[:, i])
 
         # Subtract the effect of covariates (feature = residuals = feature - predictions)
-        X[:, i] = X[:, i] - regressor.predict(c)
+        x[:, i] = x[:, i] - regressor.predict(c)
 
     return X
 
