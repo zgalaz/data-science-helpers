@@ -2,6 +2,125 @@ import pandas as pd
 from helpers.utils.validators import validate_args_numpy_array
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LinearRegression
+from sklearn.base import BaseEstimator, TransformerMixin
+
+
+class CovariateController(BaseEstimator, TransformerMixin):
+    """
+    Remove (control for) the effect of covariates
+
+    CovariateController controls for the effect of covariates (commonly called
+    confounding variables) using linear regression. More specifically, it is
+    hypothesized that if there is an effect, it can removed by subtracting the
+    predictions made by the linear model trained as X = f(c), i.e. the features
+    without the effect of covariates can be expressed as the residuals of such
+    model.
+
+    Implemented as a Scikit-learn transformer. Can be fitted on 1D or xD data
+    as there can be multiple covariates having an effect on the variables in
+    X (features). It assumes that data pre-processing such as feature scaling
+    or normalization is done prior using CovariateController.
+
+    The procedure of transforming a feature can be defined as follows:
+
+      [1.]      [2.]              [3.]                            [4.]
+    feature = feature - regressor.fit(covariates, feature).predict(covariates)
+
+    [1.] updated feature (residuals of the model)
+    [2.] original feature
+    [4.] predictions
+    [3.] trained linear model feature = f(covariates)
+
+    Parameters
+    ----------
+
+    inline : bool, optional, default False
+        Parameter that specifies if the transformation should be performed
+        inline, i.e. if it is feasible to alter the original DataFrame
+
+    Attributes
+    ----------
+
+    regressors : dict, len(models) == len(X.columns) (after fitted)
+        Dictionary with the fitted linear regression models for each column
+        in X (each column represents a feature). After __init__(), the dict
+        is empty. After fit(): {"f1": model, "f2": model, "f3": model, ...}
+
+    covariates : numpy array
+        Numpy array storing the covariates used to fit the linear regression
+        models. After __init__(), the covariates are unknown and therefore
+        the variable is None, After fir(), covariates.shape corresponds to
+        the number of observations (rows) and features (cols) used to fit
+        the models (model per input feature vector).
+
+    Examples
+    --------
+
+    >>> import numpy as np
+    >>> import pandas as pd
+    >>> from helpers.utils.transformers import CovariateController
+    >>>
+    >>> # Generate random features and covariates
+    >>> f = np.random.randn(1000, 100)
+    >>> c = np.random.randn(1000, 3)
+    >>> i = 0
+    >>>
+    >>> # Prepare the DataFrames
+    >>> df_f = pd.DataFrame({str(i): f[:, i] for i in range(f.shape[1])})
+    >>> df_c = pd.DataFrame({str(i): f[:, i] for i in range(c.shape[1])})
+    >>>
+    >>> # Control for the effect of covariates
+    >>> df_f = CovariateController(inline=True).fit_transform(df_f, df_c)
+    >>> df_f.head()
+
+    See also
+    --------
+
+    :func:`helpers.utils.transformers.remove_effect_of_covariates`
+        Standalone function that removes controls for the effect of covariates
+        using pure numpy arrays (not restricted to pd.DataFrames).
+
+    Notes
+    -----
+
+    1. Class does not handle missing values (prior transformation required)
+    2. Linear regression model used (most common, other models are possible)
+
+    """
+
+    def __init__(self, inline=False):
+
+        # Parse input arguments
+        self.inline = inline
+
+        # Prepare instance attributes
+        self.regressors = {}
+        self.covariates = None
+
+    def fit(self, X, y=None, **params):
+        assert isinstance(X, pd.DataFrame)
+        assert isinstance(y, pd.DataFrame)
+        assert X.shape[0] == y.shape[0]
+
+        # Fit the linear regressor (feature = f(covariates))
+        self.regressors = {c: LinearRegression(**params).fit(y.values, X[c].values) for c in X.columns}
+
+        # Store the covariates
+        self.covariates = y
+
+        return self
+
+    def transform(self, X):
+        assert isinstance(X, pd.DataFrame)
+
+        # Get the DataFrame to work with
+        x = X.copy() if not self.inline else X
+
+        # Remove the effect of covariates
+        for c in x.columns:
+            x[c] = x[c].values - self.regressors.get(c).predict(self.covariates.values)
+
+        return x
 
 
 @validate_args_numpy_array
