@@ -1,3 +1,4 @@
+import pandas as pd
 from helpers.utils.validators import validate_args_numpy_array
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LinearRegression
@@ -60,6 +61,32 @@ def remove_effect_of_covariates(X, c, inline=False):
         x[:, i] = x[:, i] - regressor.predict(c)
 
     return X
+
+
+class TypeSelector(BaseEstimator, TransformerMixin):
+
+    def __init__(self, dtype):
+        self.dtype = dtype
+
+    def fit(self, X, y=None):
+        return self
+
+    def transform(self, X):
+        assert isinstance(X, pd.DataFrame)
+        return X.select_dtypes(include=[self.dtype])
+
+
+class ColumnSelector(BaseEstimator, TransformerMixin):
+
+    def __init__(self, columns):
+        self.columns = columns
+
+    def fit(self, X, y=None):
+        return self
+
+    def transform(self, X):
+        assert isinstance(X, pd.DataFrame)
+        return X[self.columns]
 
 
 def make_1_ndim(x):
