@@ -97,7 +97,25 @@ class CovariateController(BaseEstimator, TransformerMixin):
         self.regressors = {}
         self.covariates = None
 
-    def fit(self, X, y=None, **params):
+    def fit(self, X, y, **params):
+        """
+        Fit the transformer
+
+        This method uses the covariates to fit the linear regression models according
+        to: features = f(covariates) (model per feature; column of X), i.e. it fits
+        the models to capture the (linear) relationship that the covariates and each
+        of the features have. The regressor can be modified using input **params.
+
+        Parameters
+        --------
+
+        X : numpy array
+            1D or 2D array of features (rows=observations, cols=features)
+
+        y : numpy array
+            1D or 2D array of covariates (rows=observations, cols=covariates)
+        """
+
         assert isinstance(X, pd.DataFrame)
         assert isinstance(y, pd.DataFrame)
         assert X.shape[0] == y.shape[0]
@@ -111,6 +129,27 @@ class CovariateController(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X):
+        """
+        Transform the data
+
+        This method uses the fitted linear regression models to predict the values of
+        the features (columns of X) and replace each of the features by the residuals
+        of such model, i.e. feature = feature - feature_hat. With this approach, the
+        new feature values are transformed in a way it removes the (linear) effect
+        of the covariates on the features.
+
+        Parameters
+        --------
+
+        X : numpy array
+            1D or 2D array of features (rows=observations, cols=features)
+
+        Returns
+        -------
+
+        Feature matrix without the effect of covariates (numpy array)
+        """
+
         assert isinstance(X, pd.DataFrame)
 
         # Get the DataFrame to work with
