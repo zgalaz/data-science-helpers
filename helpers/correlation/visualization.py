@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from helpers.correlation.computation import compute_correlation
 from helpers.utils.validators import \
+    validate_df_dataframe, \
     validate_args_rank_one_or_one_dimensional, \
     validate_x_y_numpy_array, \
     validate_x_y_observation_count
@@ -97,6 +98,76 @@ def plot_correlation(X,
     ax.set_title(r"{}: $\rho = {:.2}$, $p = {:.2}$".format(corr_type.capitalize(), r, p))
     ax.set_xlabel(x_label)
     ax.set_ylabel(y_label)
+    plt.tight_layout()
+
+    # Store the figure
+    if save_as:
+        plt.savefig(save_as)
+
+    # Show the graph (if enabled)
+    if fig_show:
+        plt.show()
+
+
+@validate_df_dataframe
+def plot_correlation_matrix(df, fig_size=(8, 8), fig_show=True, save_as="figure.pdf", **kwargs):
+    """
+    Plot the correlation matrix
+
+    This function plots the correlation matrix among all columns in <df> (only
+    columns with purely numerical data are used. Column names are used as x/y
+    tick labels, and placed in the bottom and the left side, respectively.
+    By default, the "coolwarm" cmap is used.
+
+    Parameters
+    ----------
+
+    df : pandas.DataFrame
+        Pandas DataFrame with the data for plotting
+
+    fig_size : tuple, optional, default (8, 8)
+        Size of the figure
+
+    fig_show : bool, optional, default True
+        Figure showing switch
+
+    save_as : str, optional, default "figure.pdf"
+        Name of the saved figure (if None, saving skipped)
+
+    Raises
+    ------
+
+    TypeError
+        Raised when df is not an instance of pd.DataFrame
+    """
+
+    # Create temporary DataFrame with numerical columns only
+    df_num = df.select_dtypes(include=[np.number])
+
+    # Compute the correlation matrix
+    corr = df_num.corr()
+
+    # Create the figure
+    fig = plt.figure(figsize=fig_size if fig_size else (8, 8))
+
+    # Create the axes
+    ax = fig.add_subplot(1, 1, 1)
+
+    # Plot the correlation matrix
+    fig.colorbar(ax.matshow(corr, cmap=kwargs.get("fig_cmap", "coolwarm"), vmin=-1, vmax=1))
+
+    # Set up the ticks and labels
+    ax.set_xticks(np.arange(0, len(df_num.columns), 1))
+    ax.set_yticks(np.arange(0, len(df_num.columns), 1))
+    ax.set_xticklabels(df_num.columns)
+    ax.set_yticklabels(df_num.columns)
+
+    ax.set_title("")
+    ax.set_xlabel("")
+    ax.set_ylabel("")
+
+    plt.tick_params(top=True, bottom=False, left=True, right=False)
+    plt.xticks(rotation=90)
     plt.tight_layout()
 
     # Store the figure
