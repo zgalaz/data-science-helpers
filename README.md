@@ -7,7 +7,7 @@ The main package that contains all the magic is named **helpers**. For more info
 description provided in the docstrings or take a look at the **jupyter notebooks**  for each of the packages.
 
 This package is developed by the members of [Brain Disease Analysis Laboratory](http://bdalab.utko.feec.vutbr.cz/) 
-(**BDALab**). For more information, please contact the main author: Zoltan Galaz at <z.galaz@feec.vutbr.cz>.
+(**BDALab**). For more information, please contact the main author: Zoltan Galaz at <zoltan@galaz.eu>.
 
 * * * * * * * * *
  
